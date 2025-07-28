@@ -9,7 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Plus, Users, DollarSign, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
-import { toast } from '@/hooks/use-toast';
+import { useToast } from '@/hooks/use-toast';
 
 interface Group {
   id: string;
@@ -24,12 +24,7 @@ const Index = () => {
   const { user, loading: authLoading } = useAuth();
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (user) {
-      fetchGroups();
-    }
-  }, [user]);
+  const { toast } = useToast();
 
   const fetchGroups = async () => {
     try {
@@ -107,6 +102,12 @@ const Index = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (user) {
+      fetchGroups();
+    }
+  }, [user]);
 
   // Redirect to auth if not authenticated - moved after all hooks
   if (!authLoading && !user) {
