@@ -25,11 +25,6 @@ const Index = () => {
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Redirect to auth if not authenticated
-  if (!authLoading && !user) {
-    return <Navigate to="/auth" replace />;
-  }
-
   useEffect(() => {
     if (user) {
       fetchGroups();
@@ -112,6 +107,11 @@ const Index = () => {
       setLoading(false);
     }
   };
+
+  // Redirect to auth if not authenticated - moved after all hooks
+  if (!authLoading && !user) {
+    return <Navigate to="/auth" replace />;
+  }
 
   if (authLoading || loading) {
     return (
