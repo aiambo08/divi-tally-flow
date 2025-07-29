@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { ArrowLeft, DollarSign, Users, Calendar } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { toast } from '@/hooks/use-toast';
+import { SplitSelector } from '@/components/SplitSelector';
 
 interface Member {
   user_id: string;
@@ -36,6 +37,13 @@ export default function AddExpense() {
     payer_id: '',
     selectedMembers: new Set<string>(),
   });
+  const [splitData, setSplitData] = useState<{
+    userId: string;
+    shareType: string;
+    customPercentage?: number;
+    customAmount?: number;
+    calculatedAmount: number;
+  }[]>([]);
 
   // Redirect to auth if not authenticated
   if (!authLoading && !user) {
@@ -132,10 +140,22 @@ export default function AddExpense() {
     e.preventDefault();
     if (!user || !id) return;
 
-    if (formData.selectedMembers.size === 0) {
+    if (splitData.length === 0) {
       toast({
         title: "Error",
-        description: "Debes seleccionar al menos un miembro para dividir el gasto",
+        description: "Debes configurar la división del gasto",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Verificar que la división sea válida
+    const totalSplit = splitData.reduce((sum, split) => sum + split.calculatedAmount, 0);
+    const amount = parseFloat(formData.amount);
+    if (Math.abs(totalSplit - amount) > 0.01) {
+      toast({
+        title: "Error",
+        description: "La división del gasto no es válida. Revisa los montos.",
         variant: "destructive",
       });
       return;
@@ -143,9 +163,6 @@ export default function AddExpense() {
 
     setLoading(true);
     try {
-      const amount = parseFloat(formData.amount);
-      const amountPerPerson = amount / formData.selectedMembers.size;
-
       // Create the expense
       const { data: expense, error: expenseError } = await supabase
         .from('expenses')
@@ -161,11 +178,14 @@ export default function AddExpense() {
 
       if (expenseError) throw expenseError;
 
-      // Create expense shares for selected members
-      const expenseShares = Array.from(formData.selectedMembers).map(userId => ({
+      // Create expense shares with custom split data
+      const expenseShares = splitData.map(split => ({
         expense_id: expense.id,
-        user_id: userId,
-        amount_owed: amountPerPerson,
+        user_id: split.userId,
+        amount_owed: split.calculatedAmount,
+        share_type: split.shareType,
+        custom_percentage: split.customPercentage,
+        custom_amount: split.customAmount,
       }));
 
       const { error: sharesError } = await supabase
@@ -306,66 +326,19 @@ export default function AddExpense() {
                   </div>
                 </div>
 
-                {/* Members Selection */}
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label className="text-base font-medium">Dividir entre:</Label>
-                    <div className="flex gap-2">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleSelectAll}
-                      >
-                        Todos
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleSelectNone}
-                      >
-                        Ninguno
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="space-y-3 max-h-48 overflow-y-auto border rounded-lg p-3">
-                    {members.map((member) => (
-                      <div key={member.user_id} className="flex items-center space-x-3">
-                        <Checkbox
-                          id={member.user_id}
-                          checked={formData.selectedMembers.has(member.user_id)}
-                          onCheckedChange={() => handleMemberToggle(member.user_id)}
-                        />
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={member.profiles.photo_url} />
-                          <AvatarFallback>
-                            {member.profiles.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1">
-                          <p className="font-medium text-sm">{member.profiles.name}</p>
-                          <p className="text-xs text-muted-foreground">{member.profiles.email}</p>
-                        </div>
-                        {formData.amount && formData.selectedMembers.has(member.user_id) && (
-                          <span className="text-sm text-muted-foreground">
-                            €{(parseFloat(formData.amount || '0') / formData.selectedMembers.size).toFixed(2)}
-                          </span>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  {formData.selectedMembers.size > 0 && formData.amount && (
-                    <div className="bg-muted p-3 rounded-lg">
-                      <p className="text-sm text-muted-foreground">
-                        <strong>{formData.selectedMembers.size}</strong> persona{formData.selectedMembers.size !== 1 ? 's' : ''} seleccionada{formData.selectedMembers.size !== 1 ? 's' : ''} • 
-                        <strong> €{(parseFloat(formData.amount) / formData.selectedMembers.size).toFixed(2)}</strong> por persona
-                      </p>
-                    </div>
-                  )}
-                </div>
+                {/* Split Selector */}
+                {formData.amount && members.length > 0 && (
+                  <SplitSelector
+                    totalAmount={parseFloat(formData.amount)}
+                    members={members.map(m => ({
+                      userId: m.user_id,
+                      name: m.profiles.name,
+                      email: m.profiles.email,
+                      photoUrl: m.profiles.photo_url
+                    }))}
+                    onSplitChange={setSplitData}
+                  />
+                )}
 
                 <div className="flex gap-3 pt-4">
                   <Button type="button" variant="outline" className="flex-1" asChild>
@@ -374,7 +347,7 @@ export default function AddExpense() {
                   <Button 
                     type="submit" 
                     className="flex-1" 
-                    disabled={loading || !formData.description.trim() || !formData.amount || !formData.payer_id || formData.selectedMembers.size === 0}
+                    disabled={loading || !formData.description.trim() || !formData.amount || !formData.payer_id || splitData.length === 0}
                   >
                     {loading ? 'Guardando...' : 'Añadir Gasto'}
                   </Button>

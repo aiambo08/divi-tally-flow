@@ -18,22 +18,31 @@ export type Database = {
         Row: {
           amount_owed: number
           created_at: string
+          custom_amount: number | null
+          custom_percentage: number | null
           expense_id: string
           id: string
+          share_type: string | null
           user_id: string
         }
         Insert: {
           amount_owed: number
           created_at?: string
+          custom_amount?: number | null
+          custom_percentage?: number | null
           expense_id: string
           id?: string
+          share_type?: string | null
           user_id: string
         }
         Update: {
           amount_owed?: number
           created_at?: string
+          custom_amount?: number | null
+          custom_percentage?: number | null
           expense_id?: string
           id?: string
+          share_type?: string | null
           user_id?: string
         }
         Relationships: [
@@ -172,6 +181,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      split_templates: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          group_id: string | null
+          id: string
+          template_data: Json
+          template_name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          group_id?: string | null
+          id?: string
+          template_data: Json
+          template_name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          group_id?: string | null
+          id?: string
+          template_data?: Json
+          template_name?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "split_templates_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
