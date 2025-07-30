@@ -18,6 +18,7 @@ interface GroupChatProps {
 }
 
 export const GroupChat: React.FC<GroupChatProps> = ({ groupId, groupName }) => {
+  console.log('GroupChat rendering with groupId:', groupId, 'groupName:', groupName);
   const { user } = useAuth();
   const { messages, loading, sending, sendMessage, deleteMessage } = useGroupChat(groupId);
   const [newMessage, setNewMessage] = useState('');

@@ -19,6 +19,7 @@ interface GroupMessage {
 }
 
 export const useGroupChat = (groupId: string) => {
+  console.log('useGroupChat called with groupId:', groupId);
   const { user } = useAuth();
   const [messages, setMessages] = useState<GroupMessage[]>([]);
   const [loading, setLoading] = useState(true);
