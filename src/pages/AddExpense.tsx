@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Navigate, useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
@@ -135,6 +135,16 @@ export default function AddExpense() {
   const handleSelectNone = () => {
     setFormData({ ...formData, selectedMembers: new Set() });
   };
+
+  const handleSplitChange = useCallback((splits: {
+    userId: string;
+    shareType: string;
+    customPercentage?: number;
+    customAmount?: number;
+    calculatedAmount: number;
+  }[]) => {
+    setSplitData(splits);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -336,7 +346,7 @@ export default function AddExpense() {
                       email: m.profiles.email,
                       photoUrl: m.profiles.photo_url
                     }))}
-                    onSplitChange={setSplitData}
+                    onSplitChange={handleSplitChange}
                   />
                 )}
 
