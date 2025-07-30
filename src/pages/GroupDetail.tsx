@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Plus, Users, DollarSign, Calendar, User } from 'lucide-react';
 import Layout from '@/components/Layout';
+import { GroupChat } from '@/components/GroupChat';
 import { toast } from '@/hooks/use-toast';
 
 interface GroupData {
@@ -321,6 +322,9 @@ export default function GroupDetail() {
                 )}
               </CardContent>
             </Card>
+
+            {/* Group Chat */}
+            <GroupChat groupId={id!} groupName={group.name} />
           </div>
 
           {/* Sidebar */}
