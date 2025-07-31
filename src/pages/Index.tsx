@@ -6,7 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Plus, Users, DollarSign, Calendar } from 'lucide-react';
+import { Plus, Users, DollarSign, Calendar, Wallet } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import Layout from '@/components/Layout';
 import { useToast } from '@/hooks/use-toast';
@@ -150,12 +150,20 @@ const Index = () => {
               Administra tus gastos compartidos
             </p>
           </div>
-          <Button asChild>
-            <Link to="/groups/new">
-              <Plus className="w-4 h-4 mr-2" />
-              Crear Grupo
-            </Link>
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" asChild>
+              <Link to="/personal-expenses">
+                <Wallet className="w-4 h-4 mr-2" />
+                Mis Gastos
+              </Link>
+            </Button>
+            <Button asChild>
+              <Link to="/groups/new">
+                <Plus className="w-4 h-4 mr-2" />
+                Crear Grupo
+              </Link>
+            </Button>
+          </div>
         </div>
 
         {/* Groups Grid */}

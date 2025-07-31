@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { LogOut, User, Plus, Home } from 'lucide-react';
+import { LogOut, User, Plus, Home, Wallet } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
 interface LayoutProps {
@@ -50,6 +50,17 @@ export default function Layout({ children }: LayoutProps) {
                 <Link to="/">
                   <Home className="w-4 h-4 mr-2" />
                   Grupos
+                </Link>
+              </Button>
+
+              <Button 
+                variant={location.pathname === '/personal-expenses' ? 'default' : 'ghost'} 
+                size="sm" 
+                asChild
+              >
+                <Link to="/personal-expenses">
+                  <Wallet className="w-4 h-4 mr-2" />
+                  Mis Gastos
                 </Link>
               </Button>
               
