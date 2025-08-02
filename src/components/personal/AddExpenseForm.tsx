@@ -12,6 +12,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { PersonalCategory } from '@/hooks/usePersonalExpenses';
+import { Icon } from '@/components/ui/icon';
 
 interface AddExpenseFormProps {
   open: boolean;
@@ -93,11 +94,13 @@ export const AddExpenseForm = ({ open, onOpenChange, onSubmit, categories }: Add
               <SelectContent className="bg-background border border-border shadow-lg z-50">
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={category.id}>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <div
-                        className="w-3 h-3 rounded-full"
+                        className="w-6 h-6 rounded-full flex items-center justify-center"
                         style={{ backgroundColor: category.color }}
-                      />
+                      >
+                        <Icon name={category.icon as any} className="h-3 w-3 text-white" />
+                      </div>
                       {category.name}
                     </div>
                   </SelectItem>

@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { usePersonalExpenses, PersonalExpense } from '@/hooks/usePersonalExpenses';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
+import { Icon } from '@/components/ui/icon';
 
 interface ExpensesSummaryProps {
   currentMonth: number;
@@ -81,9 +82,11 @@ export const ExpensesSummary = ({ currentMonth, currentYear }: ExpensesSummaryPr
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-4 h-4 rounded-full"
+                      className="w-8 h-8 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: expense.category?.color }}
-                    />
+                    >
+                      <Icon name={expense.category?.icon as any} className="h-4 w-4 text-white" />
+                    </div>
                     <div>
                       <div className="font-medium">{expense.description || 'Sin descripción'}</div>
                       <div className="text-sm text-muted-foreground">

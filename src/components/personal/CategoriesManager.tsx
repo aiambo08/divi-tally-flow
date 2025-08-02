@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { usePersonalExpenses } from '@/hooks/usePersonalExpenses';
 import { Badge } from '@/components/ui/badge';
+import { Icon, availableIcons } from '@/components/ui/icon';
 
 const availableColors = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308', 
@@ -13,12 +14,6 @@ const availableColors = [
   '#06b6d4', '#0ea5e9', '#3b82f6', '#6366f1',
   '#8b5cf6', '#a855f7', '#d946ef', '#ec4899',
   '#f43f5e', '#64748b'
-];
-
-const availableIcons = [
-  'UtensilsCrossed', 'Car', 'Gamepad2', 'ShoppingBag', 'Heart',
-  'Home', 'GraduationCap', 'Plane', 'Coffee', 'Gift',
-  'Shirt', 'Smartphone', 'Book', 'Music', 'MoreHorizontal'
 ];
 
 export const CategoriesManager = () => {
@@ -125,9 +120,9 @@ export const CategoriesManager = () => {
                       variant={formData.icon === icon ? "default" : "outline"}
                       size="sm"
                       onClick={() => setFormData(prev => ({ ...prev, icon }))}
-                      className="h-10"
+                      className="h-10 flex items-center justify-center"
                     >
-                      {icon}
+                      <Icon name={icon} className="h-4 w-4" />
                     </Button>
                   ))}
                 </div>
@@ -174,14 +169,13 @@ export const CategoriesManager = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
                       <div
-                        className="w-6 h-6 rounded-full"
+                        className="w-8 h-8 rounded-full flex items-center justify-center"
                         style={{ backgroundColor: category.color }}
-                      />
+                      >
+                        <Icon name={category.icon as any} className="h-4 w-4 text-white" />
+                      </div>
                       <div>
                         <div className="font-medium">{category.name}</div>
-                        <Badge variant="secondary" className="text-xs">
-                          {category.icon}
-                        </Badge>
                       </div>
                     </div>
                     
