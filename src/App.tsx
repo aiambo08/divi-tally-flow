@@ -10,6 +10,7 @@ import CreateGroup from "./pages/CreateGroup";
 import GroupDetail from "./pages/GroupDetail";
 import AddExpense from "./pages/AddExpense";
 import PersonalExpenses from "./pages/PersonalExpenses";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -28,6 +29,7 @@ const App = () => (
             <Route path="/groups/:id" element={<GroupDetail />} />
             <Route path="/groups/:id/expenses/new" element={<AddExpense />} />
             <Route path="/personal-expenses" element={<PersonalExpenses />} />
+            <Route path="/profile" element={<Profile />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
