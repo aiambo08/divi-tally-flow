@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { usePersonalExpenses, PersonalExpense } from '@/hooks/usePersonalExpenses';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Icon } from '@/components/ui/icon';
+import { Icon, getValidIconName } from '@/components/ui/icon';
 
 interface ExpensesSummaryProps {
   currentMonth: number;
@@ -19,7 +19,7 @@ export const ExpensesSummary = ({ currentMonth, currentYear }: ExpensesSummaryPr
 
   useEffect(() => {
     fetchExpenses(currentYear, currentMonth);
-  }, [currentMonth, currentYear]);
+  }, [currentMonth, currentYear, fetchExpenses]);
 
   useEffect(() => {
     const monthTotal = expenses.reduce((sum, expense) => sum + Number(expense.amount), 0);
@@ -85,7 +85,7 @@ export const ExpensesSummary = ({ currentMonth, currentYear }: ExpensesSummaryPr
                       className="w-8 h-8 rounded-full flex items-center justify-center"
                       style={{ backgroundColor: expense.category?.color }}
                     >
-                      <Icon name={expense.category?.icon as any} className="h-4 w-4 text-white" />
+                      <Icon name={getValidIconName(expense.category?.icon || 'DollarSign')} className="h-4 w-4 text-white" />
                     </div>
                     <div>
                       <div className="font-medium">{expense.description || 'Sin descripción'}</div>

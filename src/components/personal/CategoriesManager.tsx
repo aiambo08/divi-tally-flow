@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { usePersonalExpenses } from '@/hooks/usePersonalExpenses';
 import { Badge } from '@/components/ui/badge';
-import { Icon, availableIcons } from '@/components/ui/icon';
+import { Icon, availableIcons, getValidIconName } from '@/components/ui/icon';
 
 const availableColors = [
   '#ef4444', '#f97316', '#f59e0b', '#eab308', 
@@ -172,7 +172,7 @@ export const CategoriesManager = () => {
                         className="w-8 h-8 rounded-full flex items-center justify-center"
                         style={{ backgroundColor: category.color }}
                       >
-                        <Icon name={category.icon as any} className="h-4 w-4 text-white" />
+                        <Icon name={getValidIconName(category.icon)} className="h-4 w-4 text-white" />
                       </div>
                       <div>
                         <div className="font-medium">{category.name}</div>

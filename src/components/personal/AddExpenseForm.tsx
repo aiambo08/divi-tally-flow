@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { CalendarIcon } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { PersonalCategory } from '@/hooks/usePersonalExpenses';
-import { Icon } from '@/components/ui/icon';
+import { Icon, getValidIconName } from '@/components/ui/icon';
 
 interface AddExpenseFormProps {
   open: boolean;
@@ -78,6 +78,9 @@ export const AddExpenseForm = ({ open, onOpenChange, onSubmit, categories }: Add
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Añadir Nuevo Gasto</DialogTitle>
+          <DialogDescription>
+            Registra un nuevo gasto seleccionando la categoría, importe y fecha correspondientes.
+          </DialogDescription>
         </DialogHeader>
         
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -99,7 +102,7 @@ export const AddExpenseForm = ({ open, onOpenChange, onSubmit, categories }: Add
                         className="w-6 h-6 rounded-full flex items-center justify-center"
                         style={{ backgroundColor: category.color }}
                       >
-                        <Icon name={category.icon as any} className="h-3 w-3 text-white" />
+                        <Icon name={getValidIconName(category.icon)} className="h-3 w-3 text-white" />
                       </div>
                       {category.name}
                     </div>

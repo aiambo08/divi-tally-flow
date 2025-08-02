@@ -27,7 +27,7 @@ export const ExpensesChart = ({ currentMonth, currentYear }: ExpensesChartProps)
 
   useEffect(() => {
     fetchExpenses(currentYear, currentMonth);
-  }, [currentMonth, currentYear]);
+  }, [currentMonth, currentYear, fetchExpenses]);
 
   useEffect(() => {
     if (expenses.length > 0) {

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { useToast } from './use-toast';
@@ -57,7 +57,7 @@ export const usePersonalExpenses = () => {
   };
 
   // Fetch expenses for a specific month
-  const fetchExpenses = async (year: number, month: number) => {
+  const fetchExpenses = useCallback(async (year: number, month: number) => {
     if (!user) return;
 
     try {
@@ -88,7 +88,7 @@ export const usePersonalExpenses = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user, toast]);
 
   // Add new expense
   const addExpense = async (expenseData: {
