@@ -10,6 +10,7 @@ import { Separator } from '@/components/ui/separator';
 import { ArrowLeft, Plus, Users, DollarSign, Calendar, User } from 'lucide-react';
 import Layout from '@/components/Layout';
 import { GroupChat } from '@/components/GroupChat';
+import { GroupMembersManager } from '@/components/GroupMembersManager';
 import { toast } from '@/hooks/use-toast';
 
 interface GroupData {
@@ -329,33 +330,8 @@ export default function GroupDetail() {
 
           {/* Sidebar */}
           <div className="space-y-6">
-            {/* Members */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Users className="w-5 h-5" />
-                  Miembros ({members.length})
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {members.map((member) => (
-                    <div key={member.user_id} className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
-                        <AvatarImage src={member.profiles.photo_url} />
-                        <AvatarFallback>
-                          {member.profiles.name.split(' ').map(n => n[0]).join('').toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="flex-1">
-                        <p className="font-medium text-sm">{member.profiles.name}</p>
-                        <p className="text-xs text-muted-foreground">{member.profiles.email}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            {/* Members Management */}
+            <GroupMembersManager groupId={id!} />
 
             {/* Balances */}
             <Card>

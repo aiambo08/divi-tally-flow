@@ -104,18 +104,21 @@ export type Database = {
           group_id: string
           id: string
           joined_at: string
+          role: Database["public"]["Enums"]["group_role"] | null
           user_id: string
         }
         Insert: {
           group_id: string
           id?: string
           joined_at?: string
+          role?: Database["public"]["Enums"]["group_role"] | null
           user_id: string
         }
         Update: {
           group_id?: string
           id?: string
           joined_at?: string
+          role?: Database["public"]["Enums"]["group_role"] | null
           user_id?: string
         }
         Relationships: [
@@ -335,7 +338,7 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      group_role: "admin" | "member"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -462,6 +465,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      group_role: ["admin", "member"],
+    },
   },
 } as const
