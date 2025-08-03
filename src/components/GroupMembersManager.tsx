@@ -10,22 +10,22 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
-import { UserPlus, Crown, Trash2, Shield } from 'lucide-react';
+import { UserPlus, Crown, Trash2, Shield, Clock, Mail } from 'lucide-react';
 
 interface GroupMembersManagerProps {
   groupId: string;
 }
 
 export const GroupMembersManager: React.FC<GroupMembersManagerProps> = ({ groupId }) => {
-  const { members, loading, isAdmin, addMember, removeMember, changeRole } = useGroupMembers(groupId);
+  const { members, invitations, loading, isAdmin, inviteMember, cancelInvitation, removeMember, changeRole } = useGroupMembers(groupId);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newMemberEmail, setNewMemberEmail] = useState('');
   const [newMemberRole, setNewMemberRole] = useState<'admin' | 'member'>('member');
 
-  const handleAddMember = async () => {
+  const handleInviteMember = async () => {
     if (!newMemberEmail.trim()) return;
     
-    await addMember(newMemberEmail, newMemberRole);
+    await inviteMember(newMemberEmail, newMemberRole);
     setNewMemberEmail('');
     setNewMemberRole('member');
     setShowAddDialog(false);
@@ -84,9 +84,9 @@ export const GroupMembersManager: React.FC<GroupMembersManagerProps> = ({ groupI
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
-                  <DialogTitle>Agregar Nuevo Miembro</DialogTitle>
+                  <DialogTitle>Invitar Nuevo Miembro</DialogTitle>
                   <DialogDescription>
-                    Ingresa el email del usuario que quieres agregar al grupo.
+                    Ingresa el email del usuario que quieres invitar al grupo. Si no tiene cuenta, recibirá una invitación para registrarse.
                   </DialogDescription>
                 </DialogHeader>
                 <div className="space-y-4">
@@ -116,7 +116,7 @@ export const GroupMembersManager: React.FC<GroupMembersManagerProps> = ({ groupI
                     <Button variant="outline" onClick={() => setShowAddDialog(false)}>
                       Cancelar
                     </Button>
-                    <Button onClick={handleAddMember}>
+                    <Button onClick={handleInviteMember}>
                       Agregar
                     </Button>
                   </div>
@@ -208,9 +208,78 @@ export const GroupMembersManager: React.FC<GroupMembersManagerProps> = ({ groupI
             </div>
           ))}
           
-          {members.length === 0 && (
+          {/* Invitaciones pendientes */}
+          {invitations.length > 0 && (
+            <div className="mt-6">
+              <h4 className="text-sm font-medium text-muted-foreground mb-3 flex items-center gap-2">
+                <Clock className="h-4 w-4" />
+                Invitaciones pendientes ({invitations.length})
+              </h4>
+              <div className="space-y-3">
+                {invitations.map((invitation) => (
+                  <div key={invitation.id} className="flex items-center justify-between p-4 border rounded-lg bg-muted/30">
+                    <div className="flex items-center space-x-3">
+                      <Avatar>
+                        <AvatarFallback>
+                          <Mail className="h-4 w-4" />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="flex items-center space-x-2">
+                          <p className="font-medium">{invitation.invited_email}</p>
+                          <Badge variant="outline" className="flex items-center space-x-1">
+                            <Clock className="h-3 w-3" />
+                            <span>Pendiente</span>
+                          </Badge>
+                          {invitation.role === 'admin' && (
+                            <Badge variant="secondary" className="flex items-center space-x-1">
+                              <Crown className="h-3 w-3" />
+                              <span>Admin</span>
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          Invitado el {new Date(invitation.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                    </div>
+                    
+                    {isAdmin && (
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <Button variant="outline" size="sm">
+                            <Trash2 className="h-4 w-4" />
+                            Cancelar
+                          </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle>¿Cancelar invitación?</AlertDialogTitle>
+                            <AlertDialogDescription>
+                              ¿Estás seguro de que quieres cancelar la invitación para {invitation.invited_email}?
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel>No, mantener</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => cancelInvitation(invitation.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                            >
+                              Sí, cancelar
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+          
+          {members.length === 0 && invitations.length === 0 && (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">No hay miembros en este grupo</p>
+              <p className="text-muted-foreground">No hay miembros ni invitaciones en este grupo</p>
             </div>
           )}
         </div>

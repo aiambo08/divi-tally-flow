@@ -16,9 +16,22 @@ interface GroupMember {
   };
 }
 
+interface GroupInvitation {
+  id: string;
+  group_id: string;
+  invited_email: string;
+  invited_by: string;
+  role: 'admin' | 'member';
+  status: string;
+  token: string;
+  expires_at: string;
+  created_at: string;
+}
+
 export const useGroupMembers = (groupId: string) => {
   const { user } = useAuth();
   const [members, setMembers] = useState<GroupMember[]>([]);
+  const [invitations, setInvitations] = useState<GroupInvitation[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -64,62 +77,127 @@ export const useGroupMembers = (groupId: string) => {
     }
   };
 
+  const fetchInvitations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('group_invitations')
+        .select('*')
+        .eq('group_id', groupId)
+        .eq('status', 'pending');
+
+      if (error) throw error;
+      setInvitations(data || []);
+    } catch (error) {
+      console.error('Error fetching invitations:', error);
+    }
+  };
+
   useEffect(() => {
     if (groupId && user) {
       fetchMembers();
+      fetchInvitations();
     }
   }, [groupId, user]);
 
-  const addMember = async (email: string, role: 'admin' | 'member' = 'member') => {
+  const inviteMember = async (email: string, role: 'admin' | 'member' = 'member') => {
     try {
-      // First, find the user by email
-      const { data: profile, error: profileError } = await supabase
+      // Check if user already exists
+      const { data: profile } = await supabase
         .from('profiles')
         .select('user_id')
         .eq('email', email)
         .single();
 
-      if (profileError || !profile) {
-        toast({
-          title: "Error",
-          description: "No se encontró un usuario con ese email",
-          variant: "destructive",
-        });
-        return;
-      }
+      if (profile) {
+        // User exists, check if already a member
+        const existingMember = members.find(member => member.user_id === profile.user_id);
+        if (existingMember) {
+          toast({
+            title: "Error",
+            description: "Este usuario ya es miembro del grupo",
+            variant: "destructive",
+          });
+          return;
+        }
 
-      // Check if user is already a member
-      const existingMember = members.find(member => member.user_id === profile.user_id);
-      if (existingMember) {
-        toast({
-          title: "Error",
-          description: "Este usuario ya es miembro del grupo",
-          variant: "destructive",
-        });
-        return;
-      }
+        // Add directly to group
+        const { error } = await supabase
+          .from('group_members')
+          .insert({
+            group_id: groupId,
+            user_id: profile.user_id,
+            role
+          });
 
+        if (error) throw error;
+
+        toast({
+          title: "Miembro agregado",
+          description: "El usuario ha sido agregado exitosamente al grupo",
+        });
+
+        fetchMembers();
+      } else {
+        // User doesn't exist, send invitation
+        const { error } = await supabase
+          .from('group_invitations')
+          .insert({
+            group_id: groupId,
+            invited_email: email,
+            invited_by: user!.id,
+            role
+          });
+
+        if (error) {
+          if (error.code === '23505') { // Unique constraint violation
+            toast({
+              title: "Error",
+              description: "Ya existe una invitación pendiente para este email",
+              variant: "destructive",
+            });
+          } else {
+            throw error;
+          }
+          return;
+        }
+
+        toast({
+          title: "Invitación enviada",
+          description: "Se ha enviado una invitación al email proporcionado",
+        });
+
+        fetchInvitations();
+      }
+    } catch (error) {
+      console.error('Error inviting member:', error);
+      toast({
+        title: "Error",
+        description: "No se pudo enviar la invitación",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const cancelInvitation = async (invitationId: string) => {
+    try {
       const { error } = await supabase
-        .from('group_members')
-        .insert({
-          group_id: groupId,
-          user_id: profile.user_id,
-          role
-        });
+        .from('group_invitations')
+        .delete()
+        .eq('id', invitationId);
 
       if (error) throw error;
 
       toast({
-        title: "Miembro agregado",
-        description: "El miembro ha sido agregado exitosamente al grupo",
+        title: "Invitación cancelada",
+        description: "La invitación ha sido cancelada",
       });
 
-      fetchMembers();
+      fetchInvitations();
     } catch (error) {
-      console.error('Error adding member:', error);
+      console.error('Error canceling invitation:', error);
       toast({
         title: "Error",
-        description: "No se pudo agregar el miembro",
+        description: "No se pudo cancelar la invitación",
         variant: "destructive",
       });
     }
@@ -177,9 +255,11 @@ export const useGroupMembers = (groupId: string) => {
 
   return {
     members,
+    invitations,
     loading,
     isAdmin,
-    addMember,
+    inviteMember,
+    cancelInvitation,
     removeMember,
     changeRole,
     refetch: fetchMembers

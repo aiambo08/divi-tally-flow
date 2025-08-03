@@ -99,6 +99,45 @@ export type Database = {
           },
         ]
       }
+      group_invitations: {
+        Row: {
+          accepted_at: string | null
+          created_at: string
+          expires_at: string
+          group_id: string
+          id: string
+          invited_by: string
+          invited_email: string
+          role: Database["public"]["Enums"]["group_role"] | null
+          status: string | null
+          token: string
+        }
+        Insert: {
+          accepted_at?: string | null
+          created_at?: string
+          expires_at?: string
+          group_id: string
+          id?: string
+          invited_by: string
+          invited_email: string
+          role?: Database["public"]["Enums"]["group_role"] | null
+          status?: string | null
+          token?: string
+        }
+        Update: {
+          accepted_at?: string | null
+          created_at?: string
+          expires_at?: string
+          group_id?: string
+          id?: string
+          invited_by?: string
+          invited_email?: string
+          role?: Database["public"]["Enums"]["group_role"] | null
+          status?: string | null
+          token?: string
+        }
+        Relationships: []
+      }
       group_members: {
         Row: {
           group_id: string
