@@ -77,8 +77,17 @@ export default function CreateGroup() {
                 group_id: group.id,
                 user_id: existingUser.user_id,
               });
+          } else {
+            // Create invitation for non-existing users
+            await supabase
+              .from('group_invitations')
+              .insert({
+                group_id: group.id,
+                invited_by: user.id,
+                invited_email: email,
+                role: 'member',
+              });
           }
-          // Note: In a real app, you'd send email invitations to non-users
         }
       }
 
@@ -178,7 +187,7 @@ export default function CreateGroup() {
                     rows={3}
                   />
                   <p className="text-xs text-muted-foreground">
-                    Solo se añadirán usuarios que ya tengan cuenta en DiviDINERO
+                    Los usuarios existentes se añadirán automáticamente, los demás recibirán una invitación
                   </p>
                 </div>
 
